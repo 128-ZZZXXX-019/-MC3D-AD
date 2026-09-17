@@ -1,0 +1,164 @@
+version: v1.0.0
+random_seed: 42
+port: 11112
+
+dataset:
+  type: custom
+  data_dir: /home/zhengxuan/MC3D-AD-po3ad-backbone-ad-mulpro-moe-gate2/MC3D-AD-main/real3D_down
+  task_num: [12]
+  data_repeat: 50
+  train:
+    meta_file: /home/zhengxuan/MC3D-AD-po3ad-backbone-ad-mulpro-moe-gate2/MC3D-AD-main/data/Real3D/0/train
+  test:
+    meta_file: /home/zhengxuan/MC3D-AD-po3ad-backbone-ad-mulpro-moe-gate2/MC3D-AD-main/data/Real3D/0/test
+  batch_size: 32
+  workers: 1
+
+cpe:
+  best_metric: mean_class_acc
+  clip_max_norm: null
+  epochs: 1
+  freeze_backbone: true
+  in_channels: 3
+  lr: 0.001
+  momentum: 0.9
+  num_classes: 12
+  optimizer: AdamW
+  out_channels: 32
+  print_freq_step: 50
+  proj_dim: 128
+  proto_loss_weight: 0.2
+  proto_m: 0.9
+  save_freq: 100
+  step_epoch: 100
+  temperature: 0.07
+  trainable_prefixes: [proj]
+  val_frequent_epoch: 1
+  weight_decay: 0.0001
+
+  multi_proto:
+    adaptive: true
+    dispersion_step: 0.08
+    diversity_weight: 0.005
+    enabled: true
+    eval_topk: 3
+    hinge_weight: 0.3
+    inter_cos: 0.2
+    kmeans_iters: 12
+    logit_margin: 0.1
+    min_samples_per_proto: 8
+    new_proto_threshold: 0.55
+    num_prototypes: 2
+    pool_tau: 0.02
+    sample_margin: 0.15
+    stiefel_cos: 0.35
+
+  fire:
+    apply_at_task_boundary: true
+    apply_before_first_task: false
+    enabled: true
+    include_name_keywords: [proj]
+    iter_num: 10
+    only_trainable: true
+    reset_optimizer: true
+    reset_prototypes: false
+    sparse_kernel_layout: auto
+
+  repeat_pad:
+    enabled: false
+
+  tsne:
+    alpha: 0.75
+    enabled: false
+    epoch_freq: 10
+    include_prototypes: true
+    input_mode: raw_sample
+    input_num_points: 256
+    max_samples_per_split: 1200
+    n_iter: 1000
+    pca_dim: 50
+    perplexity: 30
+    point_size: 14
+    random_state: 42
+    run_on_evaluate: false
+    save: false
+    save_dir: fig
+    show_class_names_on_colorbar: true
+    splits: [train, test]
+    visualize: false
+
+ad_after_cpe:
+  ad_test_task_id_policy: current
+  config: ./config_ad_after_cpe.yaml
+  cpe_pred_task_id_policy: current
+  enabled: true
+  prototype_scope: seen
+  prototype_task_id_policy: source
+  restore_rng_after_ad: true
+  resume_ad_from_previous_task: true
+  run_after_task_ids: all
+  test_scope: seen
+  train_scope: current
+
+saver:
+  auto_resume: false
+  eval_model: null
+  load_path: null
+  log_dir: log/
+  pretrain_load_projection: true
+  pretrain_model: /home/zhengxuan/MC3D-AD-po3ad-backbone-ad-mulpro-moe-gate2/MC3D-AD-main/pretrain_ckp/cpe_real3d.pth
+  pretrain_strict: false
+  resume_load_optimizer: true
+  resume_model: null
+  save_dir: checkpoints_cpe/
+
+net:
+  - name: backbone
+    type: models.backbones.uca3dal_mink
+    frozen: false
+    kwargs:
+      arch: MinkUNet34C
+      center_shift: true
+      center_shift_apply_z: true
+      checkpoint_path: ""
+      checkpoint_strict: false
+      feature_mode: coord
+      in_channels: 3
+      load_projection: true
+      normalize_coord: true
+      normalize_eps: 1.0e-12
+      out_channels: 32
+      partial_bottom_view_weight: 0.2
+      partial_crop: false
+      partial_crop_p: 0.0
+      partial_keep_ratio_max: 0.5
+      partial_keep_ratio_min: 0.3
+      partial_min_points: 128
+      partial_soft_width: 0.02
+      partial_view_jitter: 0.2
+      proj_dim: 128
+      random_jitter: true
+      random_jitter_clip: 0.02
+      random_jitter_p: 0.5
+      random_jitter_sigma: 0.005
+      random_rotate: true
+      random_rotate_angle_max: 1.0
+      random_rotate_angle_min: -1.0
+      random_scale: true
+      random_scale_high: 1.1
+      random_scale_low: 0.9
+      random_scale_p: 0.5
+      real3d_augment: false
+      real3d_dropout: false
+      real3d_dropout_max_ratio: 0.5
+      real3d_first_rotate: false
+      real3d_fps_npoints: 0
+      real3d_scale: false
+      real3d_scale_high: 1.25
+      real3d_scale_low: 0.8
+      real3d_second_rotate: false
+      real3d_shift: false
+      real3d_shift_range: 0.1
+      train_augment: true
+      use_cpe_projection: true
+      voxel_size: 0.03

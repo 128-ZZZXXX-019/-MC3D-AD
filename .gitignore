@@ -1,0 +1,31 @@
+# Dataset indexes and point-cloud data
+/data/
+/datasets/
+/real3D_down/
+/Real3D-AD-PCD/
+
+# Model weights and generated experiment outputs
+/pretrain_ckp/
+/experiments/
+/log/
+/checkpoints*/
+/result/
+*.pth
+*.pth.tar
+*.pt
+*.ckpt
+*.pcd
+
+# Vendored/build artifacts
+/Pointnet2_PyTorch-master/
+*.whl
+*.log
+build/
+dist/
+*.egg-info/
+
+# Python/editor caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.vscode/
